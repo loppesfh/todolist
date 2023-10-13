@@ -3,7 +3,7 @@ FROM ubuntu:latest AS build
 WORKDIR /app
 
 RUN apt-get update -y
-RUN apt-get install openjdk-17-
+RUN apt-get install openjdk-17-jdk -y
 
 COPY . .
 
