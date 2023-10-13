@@ -55,11 +55,19 @@ public class TaskController {
     }
 
     @PutMapping("{taskId}")
-    public TaskModel update(@RequestBody TaskModel taskModel, @PathVariable UUID taskId, HttpServletRequest request) {
+    public ResponseEntity<Object> update(@RequestBody TaskModel taskModel, @PathVariable UUID taskId, HttpServletRequest request) {
 
         var task = taskRepository.findById(taskId).orElseThrow(() -> new RuntimeException("Não existe uma task com esse ID"));
-        Utils.copyNonNullProperties(taskModel, task);
+
+        var userId = request.getAttribute("userId");
+        if (!userId.equals(task.getIdUser())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("o usuário não é dono dessa tarefa");
+        }
         
-        return taskRepository.save(task);
+        Utils.copyNonNullProperties(taskModel, task);
+
+        TaskModel taskUpdated = taskRepository.save(task);
+        
+        return ResponseEntity.status(HttpStatus.OK).body(taskUpdated);
     }
 }
